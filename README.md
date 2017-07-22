@@ -1,16 +1,22 @@
-# Salesforce Dealers
+# Salesforce Dealers Map
 
-## Setup
+## Selesforce API credentials
 
-Since the application imports data from Salesforce API you need to have credentials to access the API
+Please, have a look at config/secrets.yml
+
+## Importing dealers
+```
+$ bundle exec rails salesforce:dealers:import
+```
 
 ## Tests
 
+Complete suite:
 ```
-$ bundle exec rspec --tag ~type:external_api
+$ bundle exec rspec
 ```
 
-Salesforce API integration
+Salesforce API only:
 ```
 $ bundle exec rspec --tag type:external_api
 ```
