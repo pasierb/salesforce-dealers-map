@@ -2,10 +2,16 @@ require 'salesforce'
 
 class SalesforceDealersService
   ATTRIBUTES_MAP = {
-    "Id" => :salesforce_identifier,
-    "Name" => :name,
-    "Dealer_Latitude__c" => :latitude,
-    "Dealer_Longitude__c" => :longitude
+    "Id"                  => :salesforce_identifier,
+    "Name"                => :name,
+    "Dealer_Latitude__c"  => :latitude,
+    "Dealer_Longitude__c" => :longitude,
+    "POS_Street__c"       => :street,
+    "POS_City__c"         => :city,
+    "POS_ZIP__c"          => :zip,
+    "POS_Country__c"      => :country,
+    "POS_State__c"        => :state,
+    "POS_Phone__c"        => :phone
   }
 
   def self.import
@@ -15,12 +21,14 @@ class SalesforceDealersService
       WHERE E_Shop_Dealer__c = 'Dealer and Point of Sale'
     ))
 
-    while response
-      response.body["records"].each do |record|
-        save_item(record)
-      end
+    Dealer.transaction do
+      while response
+        response.body["records"].each do |record|
+          save_item(record)
+        end
 
-      response = response.next
+        response = response.next
+      end
     end
   end
 
