@@ -1,27 +1,22 @@
 ;(function() {
-  $(document).on('googlemaps:loaded', function() {
-    $('.sf-dealers-map').each(function(i, el) {
-      bootstrapMap(el)
-    })
+  $(document).on('googlemaps:loaded', () => {
+    $('.sf-dealers-map').each((i, el) => bootstrapMap(el));
   });
 
-  $(document).on('click', '.sf-map-center', function(e) {
-    var $el = $(e.currentTarget);
-    var map = $($el.attr('data-map')).data('map');
+  $(document).on('click', '.sf-map-center', (e) => {
+    const $el = $(e.currentTarget);
+    const map = $($el.attr('data-map')).data('map');
 
     map.setCenter({
       lng: parseFloat($el.attr('data-longitude')),
       lat: parseFloat($el.attr('data-latitude'))
     });
     map.setZoom(12);
-
-    e.preventDefault();
-    return false;
   })
 
   function bootstrapMap(element) {
-    var infoWindow;
-    var map = new google.maps.Map(element, {
+    let infoWindow;
+    const map = new google.maps.Map(element, {
       center: new google.maps.LatLng(47.391262, 8.5058069),
       mapTypeId: 'terrain',
       zoom: 4
@@ -32,13 +27,11 @@
       pos && map.setCenter(pos);
     });
 
-    $.getJSON('/dealers.json', {
-      "coordinates": 1
-    }).done(function(response) {
-      var markers = response.dealers.map(function(dealer, i) {
-        var marker = getMarker(dealer, map);
+    $.getJSON('/dealers.json', { "coordinates": 1 }).done((response) => {
+      const markers = response.dealers.map((dealer, i) => {
+        const marker = getMarker(dealer);
 
-        marker.addListener('click', function(e) {
+        marker.addListener('click', (e) => {
           infoWindow = showInfoWindow(map, marker, dealer, infoWindow);
         });
 
@@ -52,19 +45,27 @@
   }
 
   function showInfoWindow(map, marker, dealer, activeInfoWindow) {
-    var newInfoWindow;
+    let newInfoWindow;
 
     activeInfoWindow && activeInfoWindow.close();
 
     newInfoWindow = new google.maps.InfoWindow({
-      content: dealer.name
+      content: `<div>
+        <address>
+          <strong>${dealer.name}</strong><br>
+          ${dealer.street}<br>
+          ${dealer.city}, ${dealer.state || ""} ${dealer.zip}<br>
+          ${dealer.country}<br>
+          <abbr title="Phone">P:</abbr> ${dealer.phone}
+        </address>
+      </div>`
     });
     newInfoWindow.open(map, marker);
 
     return newInfoWindow;
   }
 
-  function getMarker(dealer, map) {
+  function getMarker(dealer) {
     return new google.maps.Marker({
       position: {
         lat: dealer.latitude,
@@ -74,15 +75,15 @@
   }
 
   function currentPosition(cb) {
-    if (!navigator.geolocation) { cb(null); }
+    if (!navigator.geolocation) {
+      return cb(null);
+    }
 
-    navigator.geolocation.getCurrentPosition(function(position) {
-      var pos = {
+    navigator.geolocation.getCurrentPosition((position) => {
+      cb({
         lat: position.coords.latitude,
         lng: position.coords.longitude
-      };
-
-      cb(pos);
+      });
     });
   }
 })();
