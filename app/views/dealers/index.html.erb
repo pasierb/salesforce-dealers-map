@@ -1,0 +1,30 @@
+<div class="container-fluid">
+  <div id="all-dealers-map" class="sf-dealers-map"></div>
+</div>
+
+<div class="container">
+  <%= paginate @dealers %>
+
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th><%= Dealer.human_attribute_name(:name) %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @dealers.each do |dealer| %>
+        <tr>
+          <td><%= dealer.name %></td>
+          <td class="text-right">
+            <% if dealer.has_coordinates? %>
+              <%= link_to t(:show_on_map, scope: 'text'), "#", class: "sf-map-center", data: { longitude: dealer.longitude, latitude: dealer.latitude, map: "#all-dealers-map" } %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= paginate @dealers %>
+</div>
